@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}MTU Zincirli Sözlük - Ana Sayfa{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-content">
+        <h1><i class="fas fa-book-open"></i> MTU Zincirli Sözlük</h1>
+        <p class="hero-subtitle">Türkçe eşanlamlı ve zıt anlamlı kelimeler sözlüğü</p>
+        
+        <form action="{{ url_for('arama_sayfasi') }}" method="GET" class="search-form-hero">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" name="q" placeholder="Kelime arayın..." autocomplete="off" id="heroSearch">
+                <button type="submit" class="btn btn-primary">Ara</button>
+            </div>
+            <div class="search-suggestions" id="searchSuggestions"></div>
+        </form>
+        
+        <div class="quick-actions">
+            <a href="{{ url_for('api_rastgele_kelime') }}" class="btn btn-secondary" id="randomWordBtn">
+                <i class="fas fa-random"></i> Rastgele Kelime
+            </a>
+        </div>
+    </div>
+</div>
+
+<section class="stats-section">
+    <h2><i class="fas fa-chart-pie"></i> Sözlük İstatistikleri</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-book"></i></div>
+            <div class="stat-value">{{ stats.toplam_kelime }}</div>
+            <div class="stat-label">Toplam Kelime</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-link"></i></div>
+            <div class="stat-value">{{ stats.toplam_esanlam }}</div>
+            <div class="stat-label">Eşanlamlı İlişki</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-network-wired"></i></div>
+            <div class="stat-value">{{ stats.en_cok_esanlam|length }}</div>
+            <div class="stat-label">En Zengin Kelimeler</div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <h2><i class="fas fa-star"></i> Özellikler</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-search"></i></div>
+            <h3>Gelişmiş Arama</h3>
+            <p>Kelime, eşanlamlı ve açıklama içinde arama yapın</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-project-diagram"></i></div>
+            <h3>Zincir Görselleştirme</h3>
+            <p>Eşanlamlı kelimelerin zincir ilişkilerini görün</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-exchange-alt"></i></div>
+            <h3>Eş ve Zıt Anlamlılar</h3>
+            <p>Kelimelerin eş ve zıt anlamlılarını keşfedin</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-code"></i></div>
+            <h3>API Desteği</h3>
+            <p>REST API ile entegrasyon yapın</p>
+        </div>
+    </div>
+</section>
+
+{% if stats.en_cok_esanlam %}
+<section class="top-words-section">
+    <h2><i class="fas fa-trophy"></i> En Çok Eşanlamlıya Sahip Kelimeler</h2>
+    <div class="top-words-list">
+        {% for item in stats.en_cok_esanlam %}
+        <a href="{{ url_for('kelime_detay', kelime=item.kelime) }}" class="top-word-item">
+            <span class="word-rank">{{ loop.index }}</span>
+            <span class="word-text">{{ item.kelime }}</span>
+            <span class="word-count">{{ item.sayi }} eşanlamlı</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<script>
+// Rastgele kelime butonu
+document.getElementById('randomWordBtn').addEventListener('click', async function(e) {
+    e.preventDefault();
+    try {
+        const response = await fetch('/api/rastgele-kelime');
+        const data = await response.json();
+        if (data.kelime) {
+            window.location.href = '/kelime/' + encodeURIComponent(data.kelime);
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+    }
+});
+
+// Arama önerileri
+const heroSearch = document.getElementById('heroSearch');
+const suggestions = document.getElementById('searchSuggestions');
+let debounceTimer;
+
+heroSearch.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    const query = this.value.trim();
+    
+    if (query.length < 2) {
+        suggestions.innerHTML = '';
+        suggestions.style.display = 'none';
+        return;
+    }
+    
+    debounceTimer = setTimeout(async () => {
+        try {
+            const response = await fetch(`/api/ara?q=${encodeURIComponent(query)}&limit=5`);
+            const data = await response.json();
+            
+            if (data.sonuclar && data.sonuclar.length > 0) {
+                suggestions.innerHTML = data.sonuclar.map(s => 
+                    `<a href="/kelime/${encodeURIComponent(s.kelime)}" class="suggestion-item">${s.kelime}</a>`
+                ).join('');
+                suggestions.style.display = 'block';
+            } else {
+                suggestions.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Öneri hatası:', error);
+        }
+    }, 300);
+});
+
+// Dışarı tıklandığında önerileri kapat
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-form-hero')) {
+        suggestions.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

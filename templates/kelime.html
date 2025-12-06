@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}{{ kelime }} - MTU Zincirli Sözlük{% endblock %}
+
+{% block content %}
+<div class="word-detail-page">
+    <div class="breadcrumb">
+        <a href="{{ url_for('ana_sayfa') }}"><i class="fas fa-home"></i> Ana Sayfa</a>
+        <span class="separator">/</span>
+        <span class="current">{{ kelime }}</span>
+    </div>
+
+    {% if veri %}
+    <div class="word-header">
+        <h1 class="word-title">{{ kelime }}</h1>
+        <div class="word-actions">
+            <a href="{{ url_for('zincir_sayfasi', kelime=kelime) }}" class="btn btn-primary">
+                <i class="fas fa-project-diagram"></i> Zincir Görüntüle
+            </a>
+            <button class="btn btn-secondary" id="tdkBtn" data-kelime="{{ kelime }}">
+                <i class="fas fa-sync"></i> TDK'den Güncelle
+            </button>
+        </div>
+    </div>
+
+    <div class="word-content">
+        <div class="word-main">
+            {% if veri.aciklama %}
+            <div class="word-section">
+                <h2><i class="fas fa-book-reader"></i> Açıklama</h2>
+                <p class="description-text">{{ veri.aciklama }}</p>
+            </div>
+            {% endif %}
+
+            {% if veri.ornek %}
+            <div class="word-section">
+                <h2><i class="fas fa-quote-left"></i> Örnek Kullanım</h2>
+                <blockquote class="example-quote">{{ veri.ornek }}</blockquote>
+            </div>
+            {% endif %}
+
+            {% if esanlamlar %}
+            <div class="word-section">
+                <h2><i class="fas fa-equals"></i> Eşanlamlılar</h2>
+                <div class="tags-container">
+                    {% for esan in esanlamlar %}
+                    <a href="{{ url_for('kelime_detay', kelime=esan) }}" class="tag tag-synonym">{{ esan }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if zitanlamlar %}
+            <div class="word-section">
+                <h2><i class="fas fa-not-equal"></i> Zıt Anlamlılar</h2>
+                <div class="tags-container">
+                    {% for zit in zitanlamlar %}
+                    <a href="{{ url_for('kelime_detay', kelime=zit) }}" class="tag tag-antonym">{{ zit }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="word-sidebar">
+            {% if benzerler %}
+            <div class="sidebar-section">
+                <h3><i class="fas fa-spell-check"></i> Benzer Kelimeler</h3>
+                <ul class="similar-words-list">
+                    {% for benzer in benzerler %}
+                    <li><a href="{{ url_for('kelime_detay', kelime=benzer) }}">{{ benzer }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <div class="sidebar-section">
+                <h3><i class="fas fa-info-circle"></i> Bilgi</h3>
+                <div class="info-item">
+                    <span class="info-label">Eşanlamlı Sayısı:</span>
+                    <span class="info-value">{{ esanlamlar|length }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Zıt Anlamlı Sayısı:</span>
+                    <span class="info-value">{{ zitanlamlar|length }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="not-found">
+        <i class="fas fa-exclamation-circle"></i>
+        <h2>Kelime Bulunamadı</h2>
+        <p>"{{ kelime }}" sözlükte bulunamadı.</p>
+        <div class="not-found-actions">
+            <a href="{{ url_for('arama_sayfasi') }}?q={{ kelime }}" class="btn btn-primary">Arama Yap</a>
+            <a href="{{ url_for('ana_sayfa') }}" class="btn btn-secondary">Ana Sayfaya Dön</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.getElementById('tdkBtn')?.addEventListener('click', async function() {
+    const kelime = this.dataset.kelime;
+    const btn = this;
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Güncelleniyor...';
+    
+    try {
+        const response = await fetch(`/api/tdk/${encodeURIComponent(kelime)}`);
+        const data = await response.json();
+        
+        if (data.aciklama || (data.esanlamlar && data.esanlamlar.length > 0)) {
+            alert('TDK verisi alındı! Sayfa yenileniyor...');
+            location.reload();
+        } else {
+            alert('TDK\'den yeni veri bulunamadı.');
+        }
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sync"></i> TDK\'den Güncelle';
+    }
+});
+</script>
+{% endblock %}

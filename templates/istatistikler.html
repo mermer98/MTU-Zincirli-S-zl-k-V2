@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}İstatistikler - MTU Zincirli Sözlük{% endblock %}
+
+{% block content %}
+<div class="stats-page">
+    <div class="page-header">
+        <h1><i class="fas fa-chart-bar"></i> Sözlük İstatistikleri</h1>
+    </div>
+
+    <div class="stats-overview">
+        <div class="stat-box stat-primary">
+            <div class="stat-icon"><i class="fas fa-book"></i></div>
+            <div class="stat-info">
+                <div class="stat-number">{{ stats.toplam_kelime }}</div>
+                <div class="stat-title">Toplam Kelime</div>
+            </div>
+        </div>
+
+        <div class="stat-box stat-success">
+            <div class="stat-icon"><i class="fas fa-link"></i></div>
+            <div class="stat-info">
+                <div class="stat-number">{{ stats.toplam_esanlam }}</div>
+                <div class="stat-title">Eşanlamlı İlişki</div>
+            </div>
+        </div>
+
+        <div class="stat-box stat-warning">
+            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+            <div class="stat-info">
+                <div class="stat-number">{{ stats.en_cok_esanlam|length }}</div>
+                <div class="stat-title">En Zengin Kelimeler</div>
+            </div>
+        </div>
+    </div>
+
+    {% if stats.en_cok_esanlam %}
+    <div class="top-words-section">
+        <h2><i class="fas fa-medal"></i> En Çok Eşanlamlıya Sahip Kelimeler</h2>
+        <div class="ranking-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Kelime</th>
+                        <th>Eşanlamlı Sayısı</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in stats.en_cok_esanlam %}
+                    <tr>
+                        <td><span class="rank-badge rank-{{ loop.index }}">{{ loop.index }}</span></td>
+                        <td><a href="{{ url_for('kelime_detay', kelime=item.kelime) }}">{{ item.kelime }}</a></td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: {{ (item.sayi / stats.en_cok_esanlam[0].sayi * 100)|int }}%"></div>
+                                <span>{{ item.sayi }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('zincir_sayfasi', kelime=item.kelime) }}" class="btn btn-small btn-outline">
+                                <i class="fas fa-project-diagram"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="api-section">
+        <h2><i class="fas fa-code"></i> API Kullanımı</h2>
+        <div class="api-endpoints">
+            <div class="api-endpoint">
+                <code>GET /api/ara?q=kelime</code>
+                <p>Kelime arama</p>
+            </div>
+            <div class="api-endpoint">
+                <code>GET /api/kelime/{kelime}</code>
+                <p>Kelime detayı</p>
+            </div>
+            <div class="api-endpoint">
+                <code>GET /api/zincir/{kelime}</code>
+                <p>Eşanlamlı zinciri</p>
+            </div>
+            <div class="api-endpoint">
+                <code>GET /api/istatistikler</code>
+                <p>Sözlük istatistikleri</p>
+            </div>
+            <div class="api-endpoint">
+                <code>GET /api/rastgele-kelime</code>
+                <p>Rastgele kelime</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
