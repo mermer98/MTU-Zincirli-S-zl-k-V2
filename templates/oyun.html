@@ -81,13 +81,33 @@
     }
     
     .hangman-area {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        display: flex;
+        flex-wrap: wrap;
         gap: 2rem;
         margin-bottom: 2rem;
-        align-items: start;
+        align-items: flex-start;
+        justify-content: space-between;
     }
-    
+
+    .visual-panel {
+        flex: 3;
+        min-width: 280px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .stats-panel {
+        flex: 1;
+        min-width: 180px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: flex-end;
+        justify-content: center;
+        padding-right: 0.5rem;
+    }
+
     .hangman-drawing {
         background: rgba(255,255,255,0.15);
         backdrop-filter: blur(10px);
@@ -98,7 +118,7 @@
         font-family: 'Courier New', monospace;
         font-size: 1.4rem;
         line-height: 1.6;
-        min-height: 300px;
+        min-height: 260px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -107,11 +127,11 @@
         color: #FFD700;
         font-weight: bold;
     }
-    
+
     .hangman-drawing.shake {
         animation: shake 0.5s ease-in-out;
     }
-    
+
     @keyframes shake {
         0%, 100% { transform: translateX(0); }
         25% { transform: translateX(-10px); }
@@ -146,49 +166,46 @@
         to { text-shadow: 0 0 40px rgba(255,215,0,0.8); }
     }
     
-    .game-stats {
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-        margin: 0.5rem auto;
-        padding: 0.8rem 2rem;
-        background: rgba(0,0,0,0.3);
-        border-radius: 50px;
-        width: fit-content;
-        backdrop-filter: blur(5px);
+    .word-panel {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 20px;
+        padding: 1rem;
+        backdrop-filter: blur(10px);
     }
     
     .stat-card {
-        background: none;
-        padding: 0;
-        border: none;
-        box-shadow: none;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 10px;
+        padding: 0.6rem 1rem;
+        min-width: 120px;
         text-align: center;
         display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
         align-items: center;
-        gap: 0.8rem;
-        min-width: auto;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
     
     .stat-card:hover {
-        transform: none;
-        box-shadow: none;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 18px rgba(0,0,0,0.2);
     }
     
     .stat-value {
-        font-size: 1.4rem;
+        font-size: 1.1rem;
         font-weight: 700;
         color: #FFD700;
         margin: 0;
     }
     
     .stat-label {
-        font-size: 0.9rem;
-        color: rgba(255,255,255,0.9);
-        margin: 0;
-        font-weight: 500;
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.85);
         text-transform: uppercase;
         letter-spacing: 1px;
+        margin: 0;
     }
     
     .input-area {
@@ -488,12 +505,12 @@
         }
         
         .hangman-area {
-            grid-template-columns: 1fr;
-            gap: 2rem;
+            flex-direction: column;
+            align-items: center;
         }
         
         .hangman-drawing {
-            min-height: 250px;
+            min-height: 230px;
             font-size: 1.2rem;
         }
         
@@ -503,17 +520,14 @@
             padding: 1.5rem;
         }
         
-        .game-stats {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
+        .stats-panel {
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
         }
         
         .stat-card {
-            padding: 1rem;
-        }
-        
-        .stat-value {
-            font-size: 2rem;
+            min-width: 100px;
         }
         
         .guess-input {
@@ -554,13 +568,10 @@
             letter-spacing: 0.3rem;
         }
         
-        .game-stats {
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-        
-        .stat-card:last-child {
-            grid-column: 1 / -1;
+        .stats-panel {
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .alphabet-grid {
@@ -581,7 +592,7 @@
 {% block content %}
 <div class="game-container">
     <div class="game-header">
-        <h1 class="game-title">🎯 Adam Asmaca Oyunu <span style="font-size: 0.5em; color: #FFD700; vertical-align: middle;">v2.3</span></h1>
+        <h1 class="game-title">🎯 Adam Asmaca Oyunu <span style="font-size: 0.5em; color: #FFD700; vertical-align: middle;">v2.4</span></h1>
         <p>Gizli kelimeyi tahmin edin! Her yanlış tahmin adamı asmacaya bir adım daha yaklaştırır.</p>
         <div class="game-instructions">
             <h4>📝 Nasıl Oynanır:</h4>
@@ -598,24 +609,26 @@
     <div id="game-message" class="game-message" style="display: none;"></div>
 
     <div class="hangman-area">
-        <div class="hangman-drawing" id="hangman-drawing">
-            🤔 Oyun başlatılmadı
+        <div class="visual-panel">
+            <div class="hangman-drawing" id="hangman-drawing">
+                🤔 Oyun başlatılmadı
+            </div>
+            <div class="word-panel">
+                <div class="word-display" id="word-display">_ _ _ _ _</div>
+            </div>
         </div>
-        <div class="game-info">
-            <div class="word-display" id="word-display">_ _ _ _ _</div>
-            <div class="game-stats">
-                <div class="stat-card">
-                    <div class="stat-value" id="correct-count">0</div>
-                    <div class="stat-label">Doğru Harf</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="wrong-count">0</div>
-                    <div class="stat-label">Yanlış Harf</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="remaining-tries">6</div>
-                    <div class="stat-label">Kalan Hak</div>
-                </div>
+        <div class="stats-panel">
+            <div class="stat-card">
+                <div class="stat-value" id="correct-count">0</div>
+                <div class="stat-label">Doğru</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="wrong-count">0</div>
+                <div class="stat-label">Yanlış</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="remaining-tries">6</div>
+                <div class="stat-label">Kalan</div>
             </div>
         </div>
     </div>
