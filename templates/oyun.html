@@ -24,6 +24,29 @@
         margin-bottom: 0.5rem;
     }
     
+    .game-instructions {
+        background: var(--light-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        padding: 1rem;
+        margin-top: 1rem;
+        text-align: left;
+    }
+    
+    .game-instructions h4 {
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .game-instructions ol {
+        margin-left: 1rem;
+        line-height: 1.6;
+    }
+    
+    .game-instructions li {
+        margin-bottom: 0.25rem;
+    }
+    
     .hangman-area {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -277,6 +300,16 @@
     <div class="game-header">
         <h1 class="game-title">🎯 Adam Asmaca Oyunu</h1>
         <p>Gizli kelimeyi tahmin edin! Her yanlış tahmin adamı asmacaya bir adım daha yaklaştırır.</p>
+        <div class="game-instructions">
+            <h4>📝 Nasıl Oynanır:</h4>
+            <ol>
+                <li><strong>🎲 Yeni Oyun</strong> butonuna tıklayın</li>
+                <li>Kutucuğa bir <strong>harf</strong> yazın ve <strong>Harf Tahmin Et</strong> deyin</li>
+                <li>Veya <strong>tam kelimeyi</strong> tahmin edin</li>
+                <li><strong>6 yanlış tahmin</strong> hakkınız var!</li>
+                <li><strong>💡 İpucu</strong> için kelime açıklamasına bakın</li>
+            </ol>
+        </div>
     </div>
 
     <div id="game-message" class="game-message" style="display: none;"></div>

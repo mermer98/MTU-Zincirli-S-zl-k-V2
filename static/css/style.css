@@ -340,6 +340,23 @@ a:hover {
     color: var(--text-muted);
 }
 
+.feature-link {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--primary-color);
+    color: white;
+    border-radius: var(--radius);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.feature-link:hover {
+    background: var(--primary-dark);
+    color: white;
+}
+
 /* =============== TOP WORDS SECTION =============== */
 .top-words-section {
     margin-bottom: 2rem;
