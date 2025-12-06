@@ -354,12 +354,13 @@
     }
     
     .alphabet-grid {
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 0.5rem;
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 1rem;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        max-width: 450px !important;
+        margin: 0 auto !important;
+        padding: 15px !important;
         background: rgba(0,0,0,0.3);
         border-radius: 15px;
         border: 1px solid rgba(255,255,255,0.2);
@@ -367,12 +368,13 @@
     }
     
     .alphabet-letter {
-        width: 40px;
-        height: 40px;
+        flex: 0 0 40px !important;
+        width: 40px !important;
+        height: 40px !important;
         background: rgba(255,255,255,0.2);
         border: 2px solid rgba(255,255,255,0.3);
         border-radius: 8px;
-        display: flex;
+        display: flex !important;
         align-items: center;
         justify-content: center;
         font-weight: 700;
@@ -381,6 +383,7 @@
         transition: all 0.3s ease;
         color: white;
         font-family: 'Poppins', sans-serif;
+        user-select: none;
     }
     
     .alphabet-letter:hover {
@@ -568,15 +571,16 @@
         }
 
         .alphabet-grid {
-            grid-template-columns: repeat(6, 1fr) !important;
-            gap: 0.3rem !important;
-            padding: 0.5rem !important;
+            gap: 5px !important;
+            padding: 10px !important;
+            max-width: 100% !important;
         }
 
         .alphabet-letter {
-            width: 35px !important;
-            height: 35px !important;
-            font-size: 1rem !important;
+            flex: 0 0 32px !important;
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 0.9rem !important;
         }
     }
 </style>
