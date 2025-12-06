@@ -40,17 +40,19 @@
         50% { transform: scale(1.05); }
     }
     
-    .game-subtitle {
-        font-size: 1.2rem;
-        opacity: 0.9;
-        margin-bottom: 2rem;
-        font-weight: 300;
+    .game-title {
+        font-size: 3rem;
+        text-align: center;
+        margin-bottom: 0.25rem;
     }
-    
-    .game-instructions {
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.2);
+
+    .game-tagline {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.8);
+        margin-bottom: 1.5rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
         border-radius: 15px;
         padding: 1.5rem;
         margin-top: 2rem;
@@ -143,27 +145,34 @@
     }
     
     .word-display {
-        font-size: 5rem;
+        font-size: 3.5rem;
         font-weight: 900;
-        letter-spacing: 1rem;
+        letter-spacing: 0.7rem;
         text-align: center;
-        color: #FFD700;
-        margin: 2rem 0;
+        color: #FFE8A1;
+        margin: 1rem 0;
         padding: 2rem;
-        background: rgba(0,0,0,0.2);
-        border-radius: 20px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,215,0,0.18));
+        border-radius: 30px;
         min-height: 150px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-family: 'Poppins', sans-serif;
-        text-shadow: 0 0 30px rgba(255,215,0,0.5);
-        animation: wordGlow 2s ease-in-out infinite alternate;
+        text-shadow: 0 2px 15px rgba(0,0,0,0.5);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        border: 1px solid rgba(255,255,255,0.4);
+        position: relative;
+        overflow: hidden;
     }
-    
-    @keyframes wordGlow {
-        from { text-shadow: 0 0 20px rgba(255,215,0,0.4); }
-        to { text-shadow: 0 0 40px rgba(255,215,0,0.8); }
+
+    .word-display::after {
+        content: '';
+        position: absolute;
+        inset: 10%;
+        border: 1px dashed rgba(255,255,255,0.3);
+        border-radius: 25px;
+        pointer-events: none;
     }
     
     .word-panel {
@@ -592,18 +601,8 @@
 {% block content %}
 <div class="game-container">
     <div class="game-header">
-        <h1 class="game-title">🎯 Adam Asmaca Oyunu <span style="font-size: 0.5em; color: #FFD700; vertical-align: middle;">v2.4</span></h1>
-        <p>Gizli kelimeyi tahmin edin! Her yanlış tahmin adamı asmacaya bir adım daha yaklaştırır.</p>
-        <div class="game-instructions">
-            <h4>📝 Nasıl Oynanır:</h4>
-            <ol>
-                <li><strong>🎲 Yeni Oyun</strong> butonuna tıklayın</li>
-                <li>Kutucuğa bir <strong>harf</strong> yazın ve <strong>Harf Tahmin Et</strong> deyin</li>
-                <li>Veya <strong>tam kelimeyi</strong> tahmin edin</li>
-                <li><strong>6 yanlış tahmin</strong> hakkınız var!</li>
-                <li><strong>💡 İpucu</strong> için kelime açıklamasına bakın</li>
-            </ol>
-        </div>
+        <h1 class="game-title">🎯 Adam Asmaca Oyunu <span style="font-size: 0.5em; color: #FFD700; vertical-align: middle;">v2.5</span></h1>
+        <div class="game-tagline">Kelimeyi düşün. Harfi seç. Hızlıca kazan.</div>
     </div>
 
     <div id="game-message" class="game-message" style="display: none;"></div>
