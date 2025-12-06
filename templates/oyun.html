@@ -1,0 +1,637 @@
+{% extends "base.html" %}
+
+{% block title %}Adam Asmaca Oyunu - MTU Zincirli Sözlük{% endblock %}
+
+{% block head %}
+<style>
+    .game-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .game-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .game-title {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .hangman-area {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .hangman-drawing {
+        background: #f8f9fa;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius);
+        padding: 1rem;
+        text-align: center;
+        font-family: 'Courier New', monospace;
+        font-size: 1.2rem;
+        line-height: 1.4;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .game-info {
+        padding: 1rem;
+    }
+    
+    .word-display {
+        font-size: 2rem;
+        font-weight: bold;
+        letter-spacing: 0.5rem;
+        text-align: center;
+        color: var(--primary-color);
+        margin: 1rem 0;
+        padding: 1rem;
+        background: var(--light-color);
+        border-radius: var(--radius);
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .game-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .stat-card {
+        background: var(--light-color);
+        padding: 1rem;
+        border-radius: var(--radius);
+        text-align: center;
+        border: 1px solid var(--border-color);
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+    }
+    
+    .input-area {
+        margin: 2rem 0;
+    }
+    
+    .guess-input {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        align-items: end;
+    }
+    
+    .input-group {
+        flex: 1;
+    }
+    
+    .input-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    
+    .input-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius);
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+    
+    .input-group input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+    
+    .game-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: var(--radius);
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+    
+    .btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: var(--primary-dark);
+    }
+    
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background: #218838;
+    }
+    
+    .btn-secondary {
+        background: var(--secondary-color);
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+    
+    .used-letters {
+        margin-top: 1rem;
+    }
+    
+    .letters-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .letter-badge {
+        padding: 0.25rem 0.5rem;
+        background: var(--light-color);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .letter-wrong {
+        background: #f8d7da;
+        color: #721c24;
+        border-color: #f5c6cb;
+    }
+    
+    .letter-correct {
+        background: #d4edda;
+        color: #155724;
+        border-color: #c3e6cb;
+    }
+    
+    .hint-area {
+        background: var(--light-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .hint-title {
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .game-message {
+        padding: 1rem;
+        border-radius: var(--radius);
+        margin: 1rem 0;
+        text-align: center;
+        font-weight: 500;
+    }
+    
+    .message-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .message-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    .message-warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+    
+    @media (max-width: 768px) {
+        .hangman-area {
+            grid-template-columns: 1fr;
+        }
+        
+        .game-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .guess-input {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .game-buttons {
+            justify-content: center;
+        }
+        
+        .word-display {
+            font-size: 1.5rem;
+            letter-spacing: 0.3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="game-header">
+        <h1 class="game-title">🎯 Adam Asmaca Oyunu</h1>
+        <p>Gizli kelimeyi tahmin edin! Her yanlış tahmin adamı asmacaya bir adım daha yaklaştırır.</p>
+    </div>
+
+    <div id="game-message" class="game-message" style="display: none;"></div>
+
+    <div class="hangman-area">
+        <div class="hangman-drawing" id="hangman-drawing">
+            🤔 Oyun başlatılmadı
+        </div>
+        <div class="game-info">
+            <div class="word-display" id="word-display">_ _ _ _ _</div>
+            <div class="game-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="correct-count">0</div>
+                    <div class="stat-label">Doğru Harf</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="wrong-count">0</div>
+                    <div class="stat-label">Yanlış Harf</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="remaining-tries">6</div>
+                    <div class="stat-label">Kalan Hak</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hint-area" id="hint-area" style="display: none;">
+        <div class="hint-title">💡 İpucu:</div>
+        <div id="word-hint"></div>
+    </div>
+
+    <div class="input-area">
+        <div class="guess-input">
+            <div class="input-group">
+                <label for="letter-input">Harf Tahmini:</label>
+                <input type="text" id="letter-input" maxlength="1" placeholder="Bir harf girin (A-Z)">
+            </div>
+            <button class="btn btn-primary" id="guess-letter-btn">Harf Tahmin Et</button>
+        </div>
+        
+        <div class="guess-input">
+            <div class="input-group">
+                <label for="word-input">Kelime Tahmini:</label>
+                <input type="text" id="word-input" placeholder="Tam kelimeyi tahmin edin">
+            </div>
+            <button class="btn btn-success" id="guess-word-btn">Kelime Tahmin Et</button>
+        </div>
+    </div>
+
+    <div class="game-buttons">
+        <button class="btn btn-primary" id="new-game-btn">🎲 Yeni Oyun</button>
+        <button class="btn btn-secondary" id="give-up-btn" disabled>🏳️ Pes Et</button>
+        <a href="/" class="btn btn-secondary">🏠 Ana Sayfa</a>
+    </div>
+
+    <div class="used-letters">
+        <strong>Kullanılan Harfler:</strong>
+        <div class="letters-grid" id="used-letters-grid"></div>
+    </div>
+</div>
+
+<script>
+class AdamAsmacaGame {
+    constructor() {
+        this.gameData = null;
+        this.usedLetters = [];
+        this.wrongCount = 0;
+        this.correctCount = 0;
+        this.gameOver = false;
+        
+        this.hangmanStages = [
+            "🤔 Oyun başlasın!",
+            `   ┌──┐
+   │  │
+      │
+      │
+      │
+  ────┴────`,
+            `   ┌──┐
+   │  │
+   😵  │
+      │
+      │
+  ────┴────`,
+            `   ┌──┐
+   │  │
+   😵  │
+   │  │
+      │
+  ────┴────`,
+            `   ┌──┐
+   │  │
+   😵  │
+  /│  │
+      │
+  ────┴────`,
+            `   ┌──┐
+   │  │
+   😵  │
+  /│\\ │
+      │
+  ────┴────`,
+            `   ┌──┐
+   │  │
+   😵  │
+  /│\\ │
+  /   │
+  ────┴────`,
+            `   ┌──┐
+   │  │
+   😵  │
+  /│\\ │
+  / \\ │
+  ────┴────
+  💀 GAME OVER`
+        ];
+        
+        this.initializeEvents();
+    }
+    
+    initializeEvents() {
+        document.getElementById('new-game-btn').addEventListener('click', () => this.startNewGame());
+        document.getElementById('guess-letter-btn').addEventListener('click', () => this.guessLetter());
+        document.getElementById('guess-word-btn').addEventListener('click', () => this.guessWord());
+        document.getElementById('give-up-btn').addEventListener('click', () => this.giveUp());
+        
+        // Enter tuşu desteği
+        document.getElementById('letter-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.guessLetter();
+        });
+        
+        document.getElementById('word-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.guessWord();
+        });
+        
+        // Sadece harf girişi için filtreleme
+        document.getElementById('letter-input').addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^a-zA-ZçğıöşüÇĞIİÖŞÜ]/g, '').toUpperCase();
+        });
+    }
+    
+    async startNewGame() {
+        try {
+            const response = await fetch('/api/oyun/yeni-oyun');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.gameData = data;
+                this.usedLetters = [];
+                this.wrongCount = 0;
+                this.correctCount = 0;
+                this.gameOver = false;
+                
+                this.updateDisplay();
+                this.showMessage('🎮 Yeni oyun başladı! Bol şans!', 'success');
+                document.getElementById('give-up-btn').disabled = false;
+                document.getElementById('hint-area').style.display = 'block';
+                
+            } else {
+                this.showMessage('❌ Oyun başlatılamadı: ' + data.error, 'error');
+            }
+        } catch (error) {
+            this.showMessage('❌ Bağlantı hatası: ' + error.message, 'error');
+        }
+    }
+    
+    async guessLetter() {
+        if (this.gameOver || !this.gameData) {
+            this.showMessage('⚠️ Önce yeni bir oyun başlatın!', 'warning');
+            return;
+        }
+        
+        const input = document.getElementById('letter-input');
+        const harf = input.value.toUpperCase();
+        
+        if (!harf) {
+            this.showMessage('⚠️ Lütfen bir harf girin!', 'warning');
+            return;
+        }
+        
+        if (this.usedLetters.includes(harf)) {
+            this.showMessage('⚠️ Bu harfi zaten denediniz!', 'warning');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/oyun/harf-tahmin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    harf: harf,
+                    kelime: this.gameData.kelime,
+                    mevcut_durum: this.gameData.gizli_kelime
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.usedLetters.push(harf);
+                
+                if (data.dogru_harf) {
+                    this.correctCount++;
+                    this.gameData.gizli_kelime = data.yeni_durum;
+                    this.showMessage('✅ Doğru harf!', 'success');
+                    
+                    if (data.oyun_kazanildi) {
+                        this.gameWon();
+                    }
+                } else {
+                    this.wrongCount++;
+                    this.showMessage('❌ Yanlış harf!', 'error');
+                    
+                    if (this.wrongCount >= 6) {
+                        this.gameLost();
+                    }
+                }
+                
+                this.updateDisplay();
+                input.value = '';
+                
+            } else {
+                this.showMessage('❌ Hata: ' + data.error, 'error');
+            }
+        } catch (error) {
+            this.showMessage('❌ Bağlantı hatası: ' + error.message, 'error');
+        }
+    }
+    
+    async guessWord() {
+        if (this.gameOver || !this.gameData) {
+            this.showMessage('⚠️ Önce yeni bir oyun başlatın!', 'warning');
+            return;
+        }
+        
+        const input = document.getElementById('word-input');
+        const tahmin = input.value.toUpperCase();
+        
+        if (!tahmin) {
+            this.showMessage('⚠️ Lütfen kelime tahminizi girin!', 'warning');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/oyun/kelime-tahmin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    tahmin: tahmin,
+                    kelime: this.gameData.kelime
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                if (data.dogru_tahmin) {
+                    this.gameWon();
+                } else {
+                    this.wrongCount++;
+                    this.showMessage('❌ Yanlış kelime tahmini!', 'error');
+                    
+                    if (this.wrongCount >= 6) {
+                        this.gameLost();
+                    } else {
+                        this.updateDisplay();
+                    }
+                }
+                input.value = '';
+            } else {
+                this.showMessage('❌ Hata: ' + data.error, 'error');
+            }
+        } catch (error) {
+            this.showMessage('❌ Bağlantı hatası: ' + error.message, 'error');
+        }
+    }
+    
+    gameWon() {
+        this.gameOver = true;
+        this.showMessage('🎉 TEBRİKLER! Kelimeyi doğru tahmin ettiniz: ' + this.gameData.kelime, 'success');
+        document.getElementById('word-display').textContent = this.gameData.kelime;
+        document.getElementById('hangman-drawing').innerHTML = '🎉<br>KAZANDIN!<br>🏆';
+        document.getElementById('give-up-btn').disabled = true;
+    }
+    
+    gameLost() {
+        this.gameOver = true;
+        this.showMessage('💀 ÜZGÜNÜM! Kaybettiniz. Kelime: ' + this.gameData.kelime, 'error');
+        document.getElementById('word-display').textContent = this.gameData.kelime;
+        this.updateDisplay();
+        document.getElementById('give-up-btn').disabled = true;
+    }
+    
+    giveUp() {
+        if (this.gameData) {
+            this.gameLost();
+        }
+    }
+    
+    updateDisplay() {
+        if (!this.gameData) return;
+        
+        // Kelime görüntüsü
+        document.getElementById('word-display').textContent = this.gameData.gizli_kelime.split('').join(' ');
+        
+        // İstatistikler
+        document.getElementById('correct-count').textContent = this.correctCount;
+        document.getElementById('wrong-count').textContent = this.wrongCount;
+        document.getElementById('remaining-tries').textContent = Math.max(0, 6 - this.wrongCount);
+        
+        // Adam asmaca çizimi
+        document.getElementById('hangman-drawing').innerHTML = this.hangmanStages[this.wrongCount];
+        
+        // İpucu
+        document.getElementById('word-hint').textContent = this.gameData.aciklama;
+        
+        // Kullanılan harfler
+        this.updateUsedLetters();
+    }
+    
+    updateUsedLetters() {
+        const container = document.getElementById('used-letters-grid');
+        container.innerHTML = '';
+        
+        this.usedLetters.forEach(harf => {
+            const badge = document.createElement('span');
+            badge.className = 'letter-badge';
+            badge.textContent = harf;
+            
+            if (this.gameData.kelime.includes(harf)) {
+                badge.classList.add('letter-correct');
+            } else {
+                badge.classList.add('letter-wrong');
+            }
+            
+            container.appendChild(badge);
+        });
+    }
+    
+    showMessage(text, type) {
+        const messageEl = document.getElementById('game-message');
+        messageEl.textContent = text;
+        messageEl.className = `game-message message-${type}`;
+        messageEl.style.display = 'block';
+        
+        setTimeout(() => {
+            messageEl.style.display = 'none';
+        }, 4000);
+    }
+}
+
+// Oyunu başlat
+document.addEventListener('DOMContentLoaded', () => {
+    new AdamAsmacaGame();
+});
+</script>
+{% endblock %}

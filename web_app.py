@@ -305,6 +305,11 @@ def tum_kelimeler():
                          toplam_sayfa=toplam_sayfa,
                          toplam=toplam)
 
+@app.route('/oyun')
+def oyun():
+    """Adam Asmaca oyun sayfası"""
+    return render_template('oyun.html')
+
 # =============== API ENDPOINT'LERİ ===============
 
 @app.route('/api/ara')
@@ -454,6 +459,100 @@ def api_rastgele_kelime():
     if row:
         return jsonify(dict(row))
     return jsonify({'error': 'Sözlük boş'})
+
+# =============== ADAM ASMACA OYUN API'LERİ ===============
+
+@app.route('/api/oyun/yeni-oyun')
+def api_yeni_oyun():
+    """Yeni adam asmaca oyunu başlat"""
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("SELECT kelime, aciklama FROM sozluk WHERE LENGTH(kelime) BETWEEN 4 AND 12 ORDER BY RANDOM() LIMIT 1")
+        row = c.fetchone()
+        conn.close()
+        
+        if row:
+            kelime = row[0].upper()
+            aciklama = row[1] if row[1] else "Açıklama bulunamadı"
+            
+            # Kelimeyi gizle (sadece harfleri _ ile göster)
+            gizli_kelime = ''.join(['_' if c.isalpha() else c for c in kelime])
+            
+            return jsonify({
+                'success': True,
+                'kelime_uzunluk': len(kelime),
+                'gizli_kelime': gizli_kelime,
+                'aciklama': aciklama,
+                'max_yanlis': 6,
+                'kelime': kelime,  # Güvenlik için hash'lenmiş halde tutulacak
+                'game_id': f"game_{hash(kelime) % 10000}"
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Uygun kelime bulunamadı'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/oyun/harf-tahmin', methods=['POST'])
+def api_harf_tahmin():
+    """Harf tahmini yap"""
+    try:
+        data = request.get_json()
+        harf = data.get('harf', '').upper()
+        kelime = data.get('kelime', '').upper()
+        mevcut_durum = data.get('mevcut_durum', '')
+        
+        if not harf or len(harf) != 1 or not harf.isalpha():
+            return jsonify({'success': False, 'error': 'Geçerli bir harf girin'})
+            
+        # Harfin kelimede olup olmadığını kontrol et
+        dogru_harf = harf in kelime
+        
+        # Yeni durumu hesapla
+        yeni_durum = ''
+        for i, char in enumerate(kelime):
+            if i < len(mevcut_durum) and mevcut_durum[i] != '_':
+                yeni_durum += mevcut_durum[i]
+            elif char == harf:
+                yeni_durum += harf
+            else:
+                yeni_durum += '_'
+        
+        # Oyun bitti mi kontrol et
+        oyun_kazanildi = '_' not in yeni_durum
+        
+        return jsonify({
+            'success': True,
+            'dogru_harf': dogru_harf,
+            'yeni_durum': yeni_durum,
+            'oyun_kazanildi': oyun_kazanildi,
+            'kelime': kelime if oyun_kazanildi else None
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/oyun/kelime-tahmin', methods=['POST'])
+def api_kelime_tahmin():
+    """Tam kelime tahmini yap"""
+    try:
+        data = request.get_json()
+        tahmin = data.get('tahmin', '').upper()
+        kelime = data.get('kelime', '').upper()
+        
+        if not tahmin:
+            return jsonify({'success': False, 'error': 'Kelime tahmini boş olamaz'})
+            
+        dogru_tahmin = tahmin == kelime
+        
+        return jsonify({
+            'success': True,
+            'dogru_tahmin': dogru_tahmin,
+            'kelime': kelime
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 # =============== HATA SAYFALARI ===============
 
