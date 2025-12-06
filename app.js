@@ -21,6 +21,13 @@ const categoryInput = document.getElementById('categoryInput');
 let editMode = false;
 let currentWord = null;
 
+// HTML escaping function to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Initialize app
 function init() {
     updateWordCount();
@@ -38,6 +45,12 @@ function setupEventListeners() {
     });
     addBtn.addEventListener('click', openAddModal);
     closeBtn.addEventListener('click', closeModal);
+    closeBtn.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            closeModal();
+        }
+    });
     cancelBtn.addEventListener('click', closeModal);
     wordForm.addEventListener('submit', handleFormSubmit);
     
@@ -83,39 +96,56 @@ function displayWord(wordData) {
             <div class="word-related">
                 <h3>İlişkili Kelimeler:</h3>
                 <div class="related-words">
-                    ${wordData.related.map(w => 
-                        `<span class="related-word-link" onclick="searchRelatedWord('${w}')">${w}</span>`
-                    ).join('')}
+                    ${wordData.related.map(w => {
+                        const escapedWord = escapeHtml(w);
+                        return `<span class="related-word-link" data-word="${escapedWord}">${escapedWord}</span>`;
+                    }).join('')}
                 </div>
             </div>
         `
         : '';
 
     const exampleHTML = wordData.example
-        ? `<div class="word-example">📝 Örnek: ${wordData.example}</div>`
+        ? `<div class="word-example">📝 Örnek: ${escapeHtml(wordData.example)}</div>`
         : '';
 
     wordDisplay.innerHTML = `
         <div class="word-entry">
-            <h2 class="word-title">${wordData.word}</h2>
-            ${wordData.category ? `<span class="word-category">${wordData.category}</span>` : ''}
-            <div class="word-definition">${wordData.definition}</div>
+            <h2 class="word-title">${escapeHtml(wordData.word)}</h2>
+            ${wordData.category ? `<span class="word-category">${escapeHtml(wordData.category)}</span>` : ''}
+            <div class="word-definition">${escapeHtml(wordData.definition)}</div>
             ${exampleHTML}
             ${relatedWordsHTML}
         </div>
     `;
+    
+    // Add event listeners to related word links
+    document.querySelectorAll('.related-word-link').forEach(link => {
+        link.addEventListener('click', () => {
+            searchRelatedWord(link.getAttribute('data-word'));
+        });
+    });
 }
 
 // Display no results
 function displayNoResults(query) {
+    const escapedQuery = escapeHtml(query);
     wordDisplay.innerHTML = `
         <div class="no-results">
             <h2>Sonuç Bulunamadı</h2>
-            <p>"${query}" için bir sonuç bulunamadı.</p>
+            <p>"${escapedQuery}" için bir sonuç bulunamadı.</p>
             <p>Yeni kelime eklemek ister misiniz?</p>
-            <button class="btn btn-success" onclick="openAddModalWithWord('${query}')">Bu Kelimeyi Ekle</button>
+            <button class="btn btn-success" data-word="${escapedQuery}">Bu Kelimeyi Ekle</button>
         </div>
     `;
+    
+    // Add event listener to the button
+    const addButton = wordDisplay.querySelector('.btn-success');
+    if (addButton) {
+        addButton.addEventListener('click', () => {
+            openAddModalWithWord(addButton.getAttribute('data-word'));
+        });
+    }
 }
 
 // Search related word
