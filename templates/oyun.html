@@ -354,11 +354,9 @@
     }
     
     .alphabet-grid {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        justify-content: center !important;
-        gap: 8px !important;
-        max-width: 450px !important;
+        display: block !important;
+        text-align: center !important;
+        max-width: 500px !important;
         margin: 0 auto !important;
         padding: 15px !important;
         background: rgba(0,0,0,0.3);
@@ -368,13 +366,13 @@
     }
     
     .alphabet-letter {
-        flex: 0 0 40px !important;
+        display: inline-flex !important;
         width: 40px !important;
         height: 40px !important;
+        margin: 5px !important;
         background: rgba(255,255,255,0.2);
         border: 2px solid rgba(255,255,255,0.3);
         border-radius: 8px;
-        display: flex !important;
         align-items: center;
         justify-content: center;
         font-weight: 700;
@@ -384,6 +382,7 @@
         color: white;
         font-family: 'Poppins', sans-serif;
         user-select: none;
+        vertical-align: middle !important;
     }
     
     .alphabet-letter:hover {
@@ -571,15 +570,14 @@
         }
 
         .alphabet-grid {
-            gap: 5px !important;
             padding: 10px !important;
             max-width: 100% !important;
         }
 
         .alphabet-letter {
-            flex: 0 0 32px !important;
             width: 32px !important;
             height: 32px !important;
+            margin: 3px !important;
             font-size: 0.9rem !important;
         }
     }
@@ -589,7 +587,7 @@
 {% block content %}
 <div class="game-container">
     <div class="game-header">
-        <h1 class="game-title">🎯 Adam Asmaca Oyunu <span style="font-size: 0.5em; color: #FFD700; vertical-align: middle;">v2.1</span></h1>
+        <h1 class="game-title">🎯 Adam Asmaca Oyunu <span style="font-size: 0.5em; color: #FFD700; vertical-align: middle;">v2.2</span></h1>
         <p>Gizli kelimeyi tahmin edin! Her yanlış tahmin adamı asmacaya bir adım daha yaklaştırır.</p>
         <div class="game-instructions">
             <h4>📝 Nasıl Oynanır:</h4>
@@ -768,11 +766,23 @@ class AdamAsmacaGame {
         const alphabetGrid = document.getElementById('alphabet-grid');
         alphabetGrid.innerHTML = '';
         
+        // Inline style ile container'ı zorla
+        alphabetGrid.style.display = 'block';
+        alphabetGrid.style.textAlign = 'center';
+        
         letters.forEach(letter => {
             const letterBtn = document.createElement('div');
             letterBtn.className = 'alphabet-letter';
             letterBtn.textContent = letter;
             letterBtn.setAttribute('data-letter', letter);
+            
+            // Inline style ile harfleri zorla
+            letterBtn.style.display = 'inline-flex';
+            letterBtn.style.width = '40px';
+            letterBtn.style.height = '40px';
+            letterBtn.style.margin = '5px';
+            letterBtn.style.alignItems = 'center';
+            letterBtn.style.justifyContent = 'center';
             
             letterBtn.addEventListener('click', () => {
                 if (!letterBtn.classList.contains('disabled') && !this.gameOver && this.gameData) {
