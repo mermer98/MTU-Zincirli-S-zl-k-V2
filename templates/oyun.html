@@ -103,11 +103,20 @@
         flex: 1;
         min-width: 180px;
         display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-        align-items: flex-end;
-        justify-content: center;
+        align-items: center;
+        justify-content: flex-end;
         padding-right: 0.5rem;
+    }
+
+    .stats-line {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #FFF;
+        background: rgba(255,255,255,0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.35);
+        letter-spacing: 0.1em;
     }
 
     .hangman-drawing {
@@ -601,7 +610,7 @@
 {% block content %}
 <div class="game-container">
     <div class="game-header">
-        <h1 class="game-title">🎯 Adam Asmaca Oyunu <span style="font-size: 0.5em; color: #FFD700; vertical-align: middle;">v2.5</span></h1>
+        <h1 class="game-title">🎯 Adam Asmaca Oyunu <span style="font-size: 0.5em; color: #FFD700; vertical-align: middle;">v2.6</span></h1>
         <div class="game-tagline">Kelimeyi düşün. Harfi seç. Hızlıca kazan.</div>
     </div>
 
@@ -617,18 +626,7 @@
             </div>
         </div>
         <div class="stats-panel">
-            <div class="stat-card">
-                <div class="stat-value" id="correct-count">0</div>
-                <div class="stat-label">Doğru</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="wrong-count">0</div>
-                <div class="stat-label">Yanlış</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="remaining-tries">6</div>
-                <div class="stat-label">Kalan</div>
-            </div>
+            <div class="stats-line" id="stats-line">0 Doğru - 0 Yanlış - 6 Kalan</div>
         </div>
     </div>
 
@@ -1146,9 +1144,8 @@ class AdamAsmacaGame {
         document.getElementById('word-display').textContent = this.gameData.gizli_kelime.split('').join(' ');
         
         // İstatistikler
-        document.getElementById('correct-count').textContent = this.correctCount;
-        document.getElementById('wrong-count').textContent = this.wrongCount;
-        document.getElementById('remaining-tries').textContent = Math.max(0, 6 - this.wrongCount);
+        const remaining = Math.max(0, 6 - this.wrongCount);
+        document.getElementById('stats-line').textContent = `${this.correctCount} Doğru - ${this.wrongCount} Yanlış - ${remaining} Kalan`;
         
         // Adam asmaca çizimi
         document.getElementById('hangman-drawing').innerHTML = this.hangmanStages[this.wrongCount];
