@@ -4,126 +4,210 @@
 
 {% block head %}
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    
     .game-container {
-        max-width: 800px;
+        max-width: 1000px;
         margin: 2rem auto;
-        padding: 2rem;
-        background: white;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-lg);
+        padding: 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,255,255,0.05);
+        color: white;
+        font-family: 'Poppins', sans-serif;
     }
     
     .game-header {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 3rem;
+        position: relative;
     }
     
     .game-title {
-        font-size: 2.5rem;
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
+        font-size: 4rem;
+        font-weight: 800;
+        background: linear-gradient(45deg, #FFD700, #FFA500);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        animation: titlePulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes titlePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .game-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+        font-weight: 300;
     }
     
     .game-instructions {
-        background: var(--light-color);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        padding: 1rem;
-        margin-top: 1rem;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-top: 2rem;
         text-align: left;
+        animation: slideInFromBottom 0.8s ease-out;
+    }
+    
+    @keyframes slideInFromBottom {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
     
     .game-instructions h4 {
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
+        color: #FFD700;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        font-size: 1.1rem;
     }
     
     .game-instructions ol {
-        margin-left: 1rem;
-        line-height: 1.6;
+        margin-left: 1.5rem;
+        line-height: 1.8;
     }
     
     .game-instructions li {
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.5rem;
+        font-weight: 300;
     }
     
     .hangman-area {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-        margin-bottom: 2rem;
+        grid-template-columns: 400px 1fr;
+        gap: 3rem;
+        margin-bottom: 3rem;
+        align-items: center;
     }
     
     .hangman-drawing {
-        background: #f8f9fa;
-        border: 2px solid var(--border-color);
-        border-radius: var(--radius);
-        padding: 1rem;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 20px;
+        padding: 2rem;
         text-align: center;
         font-family: 'Courier New', monospace;
-        font-size: 1.2rem;
-        line-height: 1.4;
-        min-height: 200px;
+        font-size: 1.4rem;
+        line-height: 1.6;
+        min-height: 300px;
         display: flex;
         align-items: center;
         justify-content: center;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        color: #FFD700;
+        font-weight: bold;
+    }
+    
+    .hangman-drawing.shake {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
     }
     
     .game-info {
-        padding: 1rem;
+        padding: 0;
     }
     
     .word-display {
-        font-size: 2rem;
-        font-weight: bold;
-        letter-spacing: 0.5rem;
+        font-size: 4rem;
+        font-weight: 900;
+        letter-spacing: 1rem;
         text-align: center;
-        color: var(--primary-color);
-        margin: 1rem 0;
-        padding: 1rem;
-        background: var(--light-color);
-        border-radius: var(--radius);
-        min-height: 60px;
+        color: #FFD700;
+        margin: 2rem 0;
+        padding: 2rem;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255,215,0,0.3);
+        border-radius: 20px;
+        min-height: 100px;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-family: 'Poppins', sans-serif;
+        text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        animation: wordGlow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes wordGlow {
+        from { box-shadow: 0 0 20px rgba(255,215,0,0.4); }
+        to { box-shadow: 0 0 30px rgba(255,215,0,0.8); }
     }
     
     .game-stats {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 1rem;
-        margin: 1rem 0;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin: 2rem 0;
     }
     
     .stat-card {
-        background: var(--light-color);
-        padding: 1rem;
-        border-radius: var(--radius);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 1.5rem;
+        border-radius: 15px;
         text-align: center;
-        border: 1px solid var(--border-color);
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.15);
     }
     
     .stat-value {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: var(--primary-color);
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #FFD700;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-value.pulse {
+        animation: statPulse 0.6s ease-in-out;
+    }
+    
+    @keyframes statPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.2); }
     }
     
     .stat-label {
-        font-size: 0.9rem;
-        color: var(--text-muted);
-        margin-top: 0.25rem;
+        font-size: 1rem;
+        color: rgba(255,255,255,0.9);
+        margin-top: 0.5rem;
+        font-weight: 500;
     }
     
     .input-area {
-        margin: 2rem 0;
+        margin: 3rem 0;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 2rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.2);
     }
     
     .guess-input {
         display: flex;
-        gap: 1rem;
-        margin-bottom: 1rem;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
         align-items: end;
     }
     
@@ -133,22 +217,35 @@
     
     .input-group label {
         display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        color: #FFD700;
+        font-size: 1.1rem;
     }
     
     .input-group input {
         width: 100%;
-        padding: 0.75rem;
-        border: 2px solid var(--border-color);
-        border-radius: var(--radius);
-        font-size: 1rem;
-        transition: var(--transition);
+        padding: 1rem 1.5rem;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 15px;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+        background: rgba(255,255,255,0.9);
+        color: #333;
+        font-weight: 600;
+        font-family: 'Poppins', sans-serif;
     }
     
     .input-group input:focus {
         outline: none;
-        border-color: var(--primary-color);
+        border-color: #FFD700;
+        box-shadow: 0 0 20px rgba(255,215,0,0.3);
+        transform: translateY(-2px);
+    }
+    
+    .input-group input::placeholder {
+        color: #999;
+        font-weight: 400;
     }
     
     .game-buttons {
@@ -158,43 +255,85 @@
     }
     
     .btn {
-        padding: 0.75rem 1.5rem;
+        padding: 1rem 2rem;
         border: none;
-        border-radius: var(--radius);
-        font-size: 1rem;
-        font-weight: 500;
+        border-radius: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
         cursor: pointer;
-        transition: var(--transition);
+        transition: all 0.3s ease;
         text-decoration: none;
         display: inline-block;
         text-align: center;
+        font-family: 'Poppins', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover::before {
+        left: 100%;
     }
     
     .btn-primary {
-        background: var(--primary-color);
+        background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
         color: white;
+        box-shadow: 0 8px 16px rgba(255,107,107,0.3);
     }
     
     .btn-primary:hover {
-        background: var(--primary-dark);
+        background: linear-gradient(45deg, #FF5252, #FF7575);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(255,107,107,0.4);
     }
     
     .btn-success {
-        background: #28a745;
+        background: linear-gradient(45deg, #4ECDC4, #44A08D);
         color: white;
+        box-shadow: 0 8px 16px rgba(78,205,196,0.3);
     }
     
     .btn-success:hover {
-        background: #218838;
+        background: linear-gradient(45deg, #45B7B8, #3D8B85);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(78,205,196,0.4);
     }
     
     .btn-secondary {
-        background: var(--secondary-color);
+        background: linear-gradient(45deg, #6C5CE7, #A55EEA);
         color: white;
+        box-shadow: 0 8px 16px rgba(108,92,231,0.3);
     }
     
     .btn-secondary:hover {
-        background: #5a6268;
+        background: linear-gradient(45deg, #5F3DC4, #9C44DC);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(108,92,231,0.4);
+    }
+    
+    .btn-new-game {
+        background: linear-gradient(45deg, #FFD700, #FFA500);
+        color: #333;
+        font-weight: 700;
+        font-size: 1.2rem;
+        padding: 1.2rem 2.5rem;
+    }
+    
+    .btn-new-game:hover {
+        background: linear-gradient(45deg, #FFC107, #FF9800);
+        color: #333;
     }
     
     .used-letters {
@@ -270,26 +409,89 @@
     }
     
     @media (max-width: 768px) {
+        .game-container {
+            margin: 1rem;
+            padding: 2rem 1.5rem;
+        }
+        
+        .game-title {
+            font-size: 2.5rem;
+        }
+        
         .hangman-area {
             grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        .hangman-drawing {
+            min-height: 250px;
+            font-size: 1.2rem;
+        }
+        
+        .word-display {
+            font-size: 2.5rem;
+            letter-spacing: 0.5rem;
+            padding: 1.5rem;
         }
         
         .game-stats {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .stat-card {
+            padding: 1rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
         }
         
         .guess-input {
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
         }
         
         .game-buttons {
             justify-content: center;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .input-group input {
+            font-size: 1.1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .game-container {
+            margin: 0.5rem;
+            padding: 1.5rem 1rem;
+        }
+        
+        .game-title {
+            font-size: 2rem;
         }
         
         .word-display {
-            font-size: 1.5rem;
+            font-size: 2rem;
             letter-spacing: 0.3rem;
+        }
+        
+        .game-stats {
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .stat-card:last-child {
+            grid-column: 1 / -1;
         }
     }
 </style>
@@ -361,7 +563,7 @@
     </div>
 
     <div class="game-buttons">
-        <button class="btn btn-primary" id="new-game-btn">🎲 Yeni Oyun</button>
+        <button class="btn btn-new-game" id="new-game-btn">🎲 Yeni Oyun Başlat</button>
         <button class="btn btn-secondary" id="give-up-btn" disabled>🏳️ Pes Et</button>
         <a href="/" class="btn btn-secondary">🏠 Ana Sayfa</a>
     </div>
@@ -381,54 +583,150 @@ class AdamAsmacaGame {
         this.correctCount = 0;
         this.gameOver = false;
         
+        // Ses efektleri için audio context
+        this.audioContext = null;
+        this.initAudio();
+        
         this.hangmanStages = [
-            "🤔 Oyun başlasın!",
-            `   ┌──┐
-   │  │
-      │
-      │
-      │
-  ────┴────`,
-            `   ┌──┐
-   │  │
-   😵  │
-      │
-      │
-  ────┴────`,
-            `   ┌──┐
-   │  │
-   😵  │
-   │  │
-      │
-  ────┴────`,
-            `   ┌──┐
-   │  │
-   😵  │
-  /│  │
-      │
-  ────┴────`,
-            `   ┌──┐
-   │  │
-   😵  │
-  /│\\ │
-      │
-  ────┴────`,
-            `   ┌──┐
-   │  │
-   😵  │
-  /│\\ │
-  /   │
-  ────┴────`,
-            `   ┌──┐
-   │  │
-   😵  │
-  /│\\ │
-  / \\ │
-  ────┴────
-  💀 GAME OVER`
+            `<div style="font-size: 3rem;">🎯</div>
+            <div style="font-size: 1.2rem; margin-top: 1rem;">
+            Oyun Başlasın!<br>
+            <span style="font-size: 0.9rem; opacity: 0.7;">Yeni oyuna tıklayın</span>
+            </div>`,
+            
+            `<div style="color: #FFD700; font-size: 1.1rem;">
+            ┌─────────┐<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            └─────────┘</div>`,
+            
+            `<div style="color: #FF6B6B; font-size: 1.1rem;">
+            ┌─────────┐<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;😨&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            └─────────┘</div>`,
+            
+            `<div style="color: #FF6B6B; font-size: 1.1rem;">
+            ┌─────────┐<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;😰&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            └─────────┘</div>`,
+            
+            `<div style="color: #FF4757; font-size: 1.1rem;">
+            ┌─────────┐<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;😱&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;╱│&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            └─────────┘</div>`,
+            
+            `<div style="color: #FF3838; font-size: 1.1rem;">
+            ┌─────────┐<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;😵&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;╱│╲&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            └─────────┘</div>`,
+            
+            `<div style="color: #FF2D2D; font-size: 1.1rem;">
+            ┌─────────┐<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;😵&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;╱│╲&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;╱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            └─────────┘</div>`,
+            
+            `<div style="color: #FF1E1E; font-size: 1.1rem; animation: deathShake 0.5s ease-in-out infinite;">
+            ┌─────────┐<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;💀&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;╱│╲&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;╱&nbsp;╲&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+            │&nbsp;&nbsp;<span style="font-size: 0.8rem;">GAME OVER</span>&nbsp;&nbsp;│<br>
+            └─────────┘</div>
+            <style>
+            @keyframes deathShake {
+                0%, 100% { transform: rotate(0deg); }
+                25% { transform: rotate(-2deg); }
+                75% { transform: rotate(2deg); }
+            }
+            </style>`
         ];
         
         this.initializeEvents();
+    }
+    
+    initAudio() {
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            console.log('Audio not supported');
+        }
+    }
+    
+    playSound(frequency, duration, type = 'sine') {
+        if (!this.audioContext) return;
+        
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+        oscillator.type = type;
+        
+        gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + duration);
+    }
+    
+    playCorrectSound() {
+        // Başarı sesi - yüksek nota çıkan melodi
+        setTimeout(() => this.playSound(523, 0.2), 0);
+        setTimeout(() => this.playSound(659, 0.2), 100);
+        setTimeout(() => this.playSound(784, 0.3), 200);
+    }
+    
+    playWrongSound() {
+        // Hata sesi - düşük buzzer
+        this.playSound(200, 0.5, 'sawtooth');
+    }
+    
+    playWinSound() {
+        // Zafer fanfarı
+        const notes = [523, 659, 784, 1047];
+        notes.forEach((note, i) => {
+            setTimeout(() => this.playSound(note, 0.4), i * 150);
+        });
+    }
+    
+    playLoseSound() {
+        // Kaybetme sesi - düşen ton
+        setTimeout(() => this.playSound(400, 0.3), 0);
+        setTimeout(() => this.playSound(300, 0.3), 200);
+        setTimeout(() => this.playSound(200, 0.5), 400);
+    }
+    
+    playNewGameSound() {
+        // Oyun başlama sesi
+        setTimeout(() => this.playSound(262, 0.2), 0);
+        setTimeout(() => this.playSound(330, 0.2), 100);
+        setTimeout(() => this.playSound(392, 0.3), 200);
     }
     
     initializeEvents() {
@@ -454,6 +752,8 @@ class AdamAsmacaGame {
     
     async startNewGame() {
         try {
+            this.playNewGameSound();
+            
             const response = await fetch('/api/oyun/yeni-oyun');
             const data = await response.json();
             
@@ -464,7 +764,16 @@ class AdamAsmacaGame {
                 this.correctCount = 0;
                 this.gameOver = false;
                 
-                this.updateDisplay();
+                // Animasyonlu başlangıç
+                document.getElementById('word-display').style.transform = 'scale(0)';
+                document.getElementById('hangman-drawing').style.transform = 'scale(0)';
+                
+                setTimeout(() => {
+                    this.updateDisplay();
+                    document.getElementById('word-display').style.transform = 'scale(1)';
+                    document.getElementById('hangman-drawing').style.transform = 'scale(1)';
+                }, 100);
+                
                 this.showMessage('🎮 Yeni oyun başladı! Bol şans!', 'success');
                 document.getElementById('give-up-btn').disabled = false;
                 document.getElementById('hint-area').style.display = 'block';
@@ -515,14 +824,30 @@ class AdamAsmacaGame {
                 if (data.dogru_harf) {
                     this.correctCount++;
                     this.gameData.gizli_kelime = data.yeni_durum;
-                    this.showMessage('✅ Doğru harf!', 'success');
+                    this.playCorrectSound();
+                    this.showMessage('✅ Harika! Doğru harf!', 'success');
+                    
+                    // Doğru harf animasyonu
+                    document.getElementById('correct-count').classList.add('pulse');
+                    setTimeout(() => {
+                        document.getElementById('correct-count').classList.remove('pulse');
+                    }, 600);
                     
                     if (data.oyun_kazanildi) {
                         this.gameWon();
                     }
                 } else {
                     this.wrongCount++;
-                    this.showMessage('❌ Yanlış harf!', 'error');
+                    this.playWrongSound();
+                    this.showMessage('❌ Üzgünüm, yanlış harf!', 'error');
+                    
+                    // Yanlış harf animasyonu
+                    document.getElementById('wrong-count').classList.add('pulse');
+                    document.getElementById('hangman-drawing').classList.add('shake');
+                    setTimeout(() => {
+                        document.getElementById('wrong-count').classList.remove('pulse');
+                        document.getElementById('hangman-drawing').classList.remove('shake');
+                    }, 600);
                     
                     if (this.wrongCount >= 6) {
                         this.gameLost();
@@ -590,18 +915,86 @@ class AdamAsmacaGame {
     
     gameWon() {
         this.gameOver = true;
-        this.showMessage('🎉 TEBRİKLER! Kelimeyi doğru tahmin ettiniz: ' + this.gameData.kelime, 'success');
+        this.playWinSound();
+        
+        // Zafer animasyonu
+        document.getElementById('word-display').style.animation = 'winPulse 1s ease-in-out infinite';
+        document.getElementById('hangman-drawing').innerHTML = `
+            <div style="font-size: 4rem; animation: winBounce 1s ease-in-out infinite;">
+                🎉<br>
+                <span style="font-size: 2rem; color: #FFD700;">KAZANDIN!</span><br>
+                🏆
+            </div>
+            <style>
+                @keyframes winPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+                @keyframes winBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+            </style>
+        `;
+        
+        this.showMessage('🎉 MUHTEŞEM! Kelimeyi doğru tahmin ettiniz: ' + this.gameData.kelime, 'success');
         document.getElementById('word-display').textContent = this.gameData.kelime;
-        document.getElementById('hangman-drawing').innerHTML = '🎉<br>KAZANDIN!<br>🏆';
         document.getElementById('give-up-btn').disabled = true;
+        
+        // Konfeti efekti
+        this.createConfetti();
     }
     
     gameLost() {
         this.gameOver = true;
+        this.playLoseSound();
+        
+        // Kaybetme animasyonu
+        document.getElementById('word-display').style.animation = 'losePulse 0.5s ease-in-out 3';
+        
         this.showMessage('💀 ÜZGÜNÜM! Kaybettiniz. Kelime: ' + this.gameData.kelime, 'error');
         document.getElementById('word-display').textContent = this.gameData.kelime;
         this.updateDisplay();
         document.getElementById('give-up-btn').disabled = true;
+    }
+    
+    createConfetti() {
+        // Basit konfeti efekti
+        const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'];
+        
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.style.cssText = `
+                    position: fixed;
+                    top: -10px;
+                    left: ${Math.random() * window.innerWidth}px;
+                    width: 10px;
+                    height: 10px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    pointer-events: none;
+                    z-index: 9999;
+                    animation: confettiFall ${2 + Math.random() * 3}s linear forwards;
+                `;
+                
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 5000);
+            }, i * 100);
+        }
+        
+        // Konfeti animasyonu
+        if (!document.getElementById('confetti-style')) {
+            const style = document.createElement('style');
+            style.id = 'confetti-style';
+            style.textContent = `
+                @keyframes confettiFall {
+                    to {
+                        transform: translateY(100vh) rotate(720deg);
+                        opacity: 0;
+                    }
+                }
+                @keyframes losePulse {
+                    0%, 100% { transform: scale(1); background: rgba(255,255,255,0.1); }
+                    50% { transform: scale(0.95); background: rgba(255,107,107,0.3); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
     }
     
     giveUp() {
