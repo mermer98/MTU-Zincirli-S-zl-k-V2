@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Arama: {{ sorgu }} - MTU Zincirli Sözlük{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-search"></i> Kelime Arama</h1>
+</div>
+
+<div class="search-container">
+    <form action="{{ url_for('arama_sayfasi') }}" method="GET" class="search-form">
+        <div class="search-input-group">
+            <input type="text" name="q" value="{{ sorgu }}" placeholder="Kelime, eşanlamlı veya açıklama arayın..." autocomplete="off">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Ara</button>
+        </div>
+    </form>
+</div>
+
+{% if sorgu %}
+<div class="results-info">
+    <p><strong>{{ sonuclar|length }}</strong> sonuç bulundu: "<em>{{ sorgu }}</em>"</p>
+</div>
+
+{% if sonuclar %}
+<div class="results-grid">
+    {% for sonuc in sonuclar %}
+    <div class="result-card">
+        <a href="{{ url_for('kelime_detay', kelime=sonuc.kelime) }}" class="result-title">
+            {{ sonuc.kelime }}
+        </a>
+        {% if sonuc.aciklama %}
+        <p class="result-description">{{ sonuc.aciklama[:150] }}{% if sonuc.aciklama|length > 150 %}...{% endif %}</p>
+        {% endif %}
+        {% if sonuc.esanlamlar %}
+        <div class="result-synonyms">
+            <span class="label"><i class="fas fa-equals"></i> Eşanlamlılar:</span>
+            {% for esan in sonuc.esanlamlar.split(',')[:5] %}
+            <a href="{{ url_for('kelime_detay', kelime=esan.strip()) }}" class="tag tag-synonym">{{ esan.strip() }}</a>
+            {% endfor %}
+            {% if sonuc.esanlamlar.split(',')|length > 5 %}
+            <span class="tag tag-more">+{{ sonuc.esanlamlar.split(',')|length - 5 }} daha</span>
+            {% endif %}
+        </div>
+        {% endif %}
+        <div class="result-actions">
+            <a href="{{ url_for('zincir_sayfasi', kelime=sonuc.kelime) }}" class="btn btn-small btn-outline">
+                <i class="fas fa-project-diagram"></i> Zincir
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="no-results">
+    <i class="fas fa-search"></i>
+    <h3>Sonuç bulunamadı</h3>
+    <p>"{{ sorgu }}" için herhangi bir kelime bulunamadı.</p>
+    <a href="{{ url_for('ana_sayfa') }}" class="btn btn-primary">Ana Sayfaya Dön</a>
+</div>
+{% endif %}
+
+{% else %}
+<div class="search-tips">
+    <h3><i class="fas fa-lightbulb"></i> Arama İpuçları</h3>
+    <ul>
+        <li>Kelimeyi doğrudan yazarak arama yapabilirsiniz</li>
+        <li>Eşanlamlı kelimeleri de arama yapabilirsiniz</li>
+        <li>Açıklama içinde arama yapmak için birden fazla kelime kullanabilirsiniz</li>
+    </ul>
+</div>
+{% endif %}
+{% endblock %}

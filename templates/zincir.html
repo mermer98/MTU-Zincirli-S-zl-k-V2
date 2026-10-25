@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Zincir: {{ kelime }} - MTU Zincirli Sözlük{% endblock %}
+
+{% block extra_head %}
+<script src="https://d3js.org/d3.v7.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="chain-page">
+    <div class="breadcrumb">
+        <a href="{{ url_for('ana_sayfa') }}"><i class="fas fa-home"></i> Ana Sayfa</a>
+        <span class="separator">/</span>
+        <a href="{{ url_for('kelime_detay', kelime=kelime) }}">{{ kelime }}</a>
+        <span class="separator">/</span>
+        <span class="current">Zincir</span>
+    </div>
+
+    <div class="chain-header">
+        <h1><i class="fas fa-project-diagram"></i> Eşanlamlı Zinciri: {{ kelime }}</h1>
+        
+        <div class="chain-controls">
+            <label for="depthSelect">Derinlik:</label>
+            <select id="depthSelect" onchange="changeDepth(this.value)">
+                <option value="2" {% if derinlik == 2 %}selected{% endif %}>2</option>
+                <option value="3" {% if derinlik == 3 %}selected{% endif %}>3</option>
+                <option value="4" {% if derinlik == 4 %}selected{% endif %}>4</option>
+                <option value="5" {% if derinlik == 5 %}selected{% endif %}>5</option>
+            </select>
+        </div>
+    </div>
+
+    {% if yollar %}
+    <div class="chain-container">
+        <div class="chain-visualization">
+            <div id="chainGraph"></div>
+        </div>
+
+        <div class="chain-paths">
+            <h2><i class="fas fa-route"></i> Zincir Yolları ({{ yollar|length }})</h2>
+            <div class="paths-list">
+                {% for yol in yollar %}
+                <div class="path-item">
+                    <span class="path-number">{{ loop.index }}</span>
+                    <div class="path-content">
+                        {% for kelime_yol in yol %}
+                        <a href="{{ url_for('kelime_detay', kelime=kelime_yol) }}" class="path-word">{{ kelime_yol }}</a>
+                        {% if not loop.last %}<span class="path-arrow">→</span>{% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function changeDepth(depth) {
+        window.location.href = `/zincir/{{ kelime }}?derinlik=${depth}`;
+    }
+
+    // D3.js ile zincir görselleştirme
+    const chainData = {{ zincir | tojson | safe }};
+    
+    // Graf verisi oluştur
+    const nodes = [];
+    const links = [];
+    const nodeSet = new Set();
+
+    function processChain(chain) {
+        for (const [parent, children] of Object.entries(chain)) {
+            if (!nodeSet.has(parent)) {
+                nodeSet.add(parent);
+                nodes.push({ id: parent, isRoot: parent === '{{ kelime }}' });
+            }
+            
+            if (Array.isArray(children)) {
+                for (const child of children) {
+                    if (!nodeSet.has(child)) {
+                        nodeSet.add(child);
+                        nodes.push({ id: child, isRoot: false });
+                    }
+                    links.push({ source: parent, target: child });
+                }
+            }
+        }
+    }
+
+    processChain(chainData);
+
+    // SVG oluştur
+    const width = document.getElementById('chainGraph').clientWidth || 800;
+    const height = 500;
+
+    const svg = d3.select("#chainGraph")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("viewBox", [0, 0, width, height]);
+
+    // Simülasyon
+    const simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(d => d.id).distance(100))
+        .force("charge", d3.forceManyBody().strength(-300))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collision", d3.forceCollide().radius(40));
+
+    // Linkler
+    const link = svg.append("g")
+        .attr("class", "links")
+        .selectAll("line")
+        .data(links)
+        .join("line")
+        .attr("stroke", "#999")
+        .attr("stroke-opacity", 0.6)
+        .attr("stroke-width", 2)
+        .attr("marker-end", "url(#arrowhead)");
+
+    // Ok işareti
+    svg.append("defs").append("marker")
+        .attr("id", "arrowhead")
+        .attr("viewBox", "-0 -5 10 10")
+        .attr("refX", 20)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .append("path")
+        .attr("d", "M 0,-5 L 10,0 L 0,5")
+        .attr("fill", "#999");
+
+    // Node grupları
+    const node = svg.append("g")
+        .attr("class", "nodes")
+        .selectAll("g")
+        .data(nodes)
+        .join("g")
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended));
+
+    // Node daireleri
+    node.append("circle")
+        .attr("r", d => d.isRoot ? 25 : 18)
+        .attr("fill", d => d.isRoot ? "#4a90d9" : "#6c757d")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2)
+        .style("cursor", "pointer")
+        .on("click", (event, d) => {
+            window.location.href = `/kelime/${encodeURIComponent(d.id)}`;
+        });
+
+    // Node etiketleri
+    node.append("text")
+        .text(d => d.id)
+        .attr("text-anchor", "middle")
+        .attr("dy", 35)
+        .attr("font-size", "12px")
+        .attr("fill", "#333");
+
+    // Simülasyon güncellemeleri
+    simulation.on("tick", () => {
+        link
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
+
+        node.attr("transform", d => `translate(${d.x},${d.y})`);
+    });
+
+    // Drag fonksiyonları
+    function dragstarted(event, d) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+    }
+
+    function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+    }
+
+    function dragended(event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+    }
+    </script>
+
+    {% else %}
+    <div class="no-chain">
+        <i class="fas fa-unlink"></i>
+        <h2>Zincir Bulunamadı</h2>
+        <p>"{{ kelime }}" için eşanlamlı zinciri oluşturulamadı.</p>
+        <a href="{{ url_for('kelime_detay', kelime=kelime) }}" class="btn btn-primary">Kelime Detayına Dön</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

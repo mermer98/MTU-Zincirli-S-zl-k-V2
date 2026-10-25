@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Sayfa Bulunamadı - MTU Zincirli Sözlük{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h1>404</h1>
+    <h2>Sayfa Bulunamadı</h2>
+    <p>Aradığınız sayfa mevcut değil veya taşınmış olabilir.</p>
+    <div class="error-actions">
+        <a href="{{ url_for('ana_sayfa') }}" class="btn btn-primary">
+            <i class="fas fa-home"></i> Ana Sayfaya Dön
+        </a>
+        <a href="{{ url_for('arama_sayfasi') }}" class="btn btn-secondary">
+            <i class="fas fa-search"></i> Arama Yap
+        </a>
+    </div>
+</div>
+{% endblock %}

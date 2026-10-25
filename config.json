@@ -1,0 +1,6 @@
+{
+    "db_path": "sozluk.db",
+    "theme": "DarkBlue3",
+    "font": ["Segoe UI", 12],
+    "esanlamli_buton_sayisi": 15
+}
